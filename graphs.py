@@ -234,7 +234,7 @@ class Graph:
         Returns:
         degree of v in the graph.
         """
-        return self.graph.degree()
+        return self.graph.degree(v)
     def weight(self, v0: int, v1: int):
         """Returns the weight of the edge between v0 and v1; None if no weight.
 
@@ -247,7 +247,7 @@ class Graph:
         Returns:
         The weight of the edge between v0 and v1; None if graph is unweighted.
         """
-        return self.graph.weight()
+        return self.graph.weight(v0,v1)
 
 # class AdjacencyMatrix:
 #   def __init__(self, edges):
@@ -260,25 +260,19 @@ class Graph:
 class AdjacencyList(Graph):
 
   def __init__(self, edges):
-    self.adjList = dict #adjacency List representation
-    self.weighted = False; #wether the graph has weights or not
-
-    f = open(edges,"r")
-    line = f.readline()
-    line = line.split()
-    if len(line)>2:
-      self.weighted = True
-    edj = 1 #number of lines in the file represent number of edges
-    while line:
+    self.adjList = dict() #adjacency List representation
+    self.weighted = False #weather the graph has weights or not
+    edj = 0
+    for line in edges:
+      line = line.split()
       if len(line) > 2:
         line = [int(line[0]), int(line[1]), eval(line[2])]
-        self.adjList[line[0]] = self.adjList.get(line[0], []).append((line[1],line[2]))
-        self.adjList[line[1]] = self.adjList.get(line[1], []).append((line[0],line[2]))
+        self.adjList[line[0]] = self.adjList.get(line[0], []) + [(line[1], line[2])]
+        self.adjList[line[1]] = self.adjList.get(line[1], []) + [(line[0],line[2])]
       else:
         line = [int(line[0]),int(line[1])]
-        self.adjList[line[0]] = self.adjList.get(line[0], []).append((line[1],1)) 
-        self.adjList[line[1]] = self.adjList.get(line[1], []).append((line[0],1))
-      line = f.readline()
+        self.adjList[line[0]] = self.adjList.get(line[0], []) + [(line[1],1)]
+        self.adjList[line[1]] = self.adjList.get(line[1], []) + [(line[0],1)]
       edj+=1
     self.verCount = len(self.adjList) #number of keys represent the number of vertex
     self.edgeCount = edj
@@ -301,11 +295,10 @@ class AdjacencyList(Graph):
     for key in self.adjList:
       for val in self.adjList[key]:
         if val[0] not in visited:
-          edj = edge(key,val[0])
-          final.append(edj)
+          ed = Edge(key,val[0])
+          final.append(ed)
       visited.append(key)
     return final
-
 
   def has_vertex(self,v):
     return v in self.adjList
@@ -314,7 +307,7 @@ class AdjacencyList(Graph):
     for val in self.adjList[v0]:
       if val[0] == v1:
         return True
-    return false
+    return False
 
   def degree(self, v):
     if self.has_vertex(v):
@@ -324,7 +317,7 @@ class AdjacencyList(Graph):
     if self.has_vertex(v):
       lst = []
       for ver in self.adjList[v]:
-        lst.append(ver)
+        lst.append(ver[0])
       return lst
   
   def has_weights(self):
@@ -336,6 +329,6 @@ class AdjacencyList(Graph):
         if val[0] == v1:
           return val[1]
     return None
-  
+
 graph = Graph("hep.txt", "list")
 print(graph.edge_count())
