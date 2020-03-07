@@ -26,7 +26,7 @@ class Edge:
         """
         return f'({self.v0}, {self.v1})'
 
-    def __eq__(self, other: Edge) -> bool:
+    def __eq__(self, other) -> bool:
         """Does other have the same enpoints?
 
         Allows `==` on instances.
@@ -108,9 +108,9 @@ class Graph:
         Returns:
         nothing.
         """
-        if imp == "sets":
-            self.graph = SetGraph(edges)
-        elif imp == "matrix":
+        # if imp == "sets":
+        #     self.graph = SetGraph(edges)
+        if imp == "matrix":
             self.graph = AdjacencyMatrix(edges)
         elif imp == "list":
             self.graph = AdjacencyList(edges)
@@ -127,7 +127,8 @@ class Graph:
         Yields:
         vertices in the graph.
         """
-        pass
+        for ver in self.graph.getvertices():
+          yield ver
 
     def edges(self) -> {Edge}:
         """Iterates over the edges in the graph.
@@ -141,7 +142,8 @@ class Graph:
         Yields:
         vertices in the graph.
         """
-        pass
+        for edge in self.graph.getEdges():
+          yield edge
 
     def vertex_count(self) -> int:
         """Returns the number of vertices in the graph.
@@ -152,7 +154,7 @@ class Graph:
         Returns:
         the number of vertices in the graph.
         """
-        pass
+        return self.graph.vertex_count()
 
     def edge_count(self) -> int:
         """Returns the number of edges in the graph.
@@ -163,7 +165,7 @@ class Graph:
         Returns:
         the number of edges in the graph.
         """
-        pass
+        return self.graph.edge_count()
 
     def has_vertex(self, v) -> bool:
         """Returns whether v is a vertex in the graph.
@@ -175,7 +177,7 @@ class Graph:
         Returns:
         True if v is a vertex in the graph, False otherwise.
         """
-        pass
+        return self.graph.has_vertex(v)
 
     def has_edge(self, v0, v1) -> bool:
         """Returns whether the grpah contains an edge between v0 and v1.
@@ -189,7 +191,7 @@ class Graph:
         """
         assert self.has_vertex(v0) and self.has_vertex(v1), \
             f'one or more of {v0} and {v1} are not valid vertices'
-        pass
+        return self.graph.has_edge(v0,v1)
 
     def has_weights(self) -> bool:
         """Returns whether the graph is weighted.
@@ -200,7 +202,7 @@ class Graph:
         Returns:
         True if the graph edges are weighted, False otherwise.
         """
-        pass
+        return self.graph.has_weights()
 
     def neighbors(self, v):
         """Iterates over the neighbors of the vertex v in the graph.
@@ -217,7 +219,8 @@ class Graph:
         Yields:
         neighbors of v in the graph.
         """
-        pass
+        for neighbor in self.graph.neighbors(v):
+          yield neighbor
 
     def degree(self, v) -> {int}:
         """Returns the degree of the vertex v in the graph.
@@ -231,4 +234,108 @@ class Graph:
         Returns:
         degree of v in the graph.
         """
-        pass
+        return self.graph.degree()
+    def weight(self, v0: int, v1: int):
+        """Returns the weight of the edge between v0 and v1; None if no weight.
+
+        Assumes the presence of the edge between v0 and v1. Check before calling.
+
+        Args:
+        - self: the instance to operate on.
+        - v0, v1: the weight of the edge between v0 and v1 is sought.
+
+        Returns:
+        The weight of the edge between v0 and v1; None if graph is unweighted.
+        """
+        return self.graph.weight()
+
+# class AdjacencyMatrix:
+#   def __init__(self, edges):
+#     f = open(edges,"r")
+#     line = f.readline()
+#     while line:
+#       line = line.split()
+
+
+class AdjacencyList(Graph):
+
+  def __init__(self, edges):
+    self.adjList = dict #adjacency List representation
+    self.weighted = False; #wether the graph has weights or not
+
+    f = open(edges,"r")
+    line = f.readline()
+    line = line.split()
+    if len(line)>2:
+      self.weighted = True
+    edj = 1 #number of lines in the file represent number of edges
+    while line:
+      if len(line) > 2:
+        line = [int(line[0]), int(line[1]), eval(line[2])]
+        self.adjList[line[0]] = self.adjList.get(line[0], []).append((line[1],line[2]))
+        self.adjList[line[1]] = self.adjList.get(line[1], []).append((line[0],line[2]))
+      else:
+        line = [int(line[0]),int(line[1])]
+        self.adjList[line[0]] = self.adjList.get(line[0], []).append((line[1],1)) 
+        self.adjList[line[1]] = self.adjList.get(line[1], []).append((line[0],1))
+      line = f.readline()
+      edj+=1
+    self.verCount = len(self.adjList) #number of keys represent the number of vertex
+    self.edgeCount = edj
+
+  def vertex_count(self):
+    return self.verCount
+
+  def edge_count(self):
+    return self.edgeCount
+
+  def getvertices(self) -> [int]:
+    lst = []
+    for key in self.adjList.keys():
+      lst.append(int(key))
+    return lst
+  
+  def getEdges(self):
+    visited = []
+    final = []
+    for key in self.adjList:
+      for val in self.adjList[key]:
+        if val[0] not in visited:
+          edj = edge(key,val[0])
+          final.append(edj)
+      visited.append(key)
+    return final
+
+
+  def has_vertex(self,v):
+    return v in self.adjList
+  
+  def has_edge(self,v0,v1):
+    for val in self.adjList[v0]:
+      if val[0] == v1:
+        return True
+    return false
+
+  def degree(self, v):
+    if self.has_vertex(v):
+      return len(self.adjList[v])
+
+  def neighbors(self, v):
+    if self.has_vertex(v):
+      lst = []
+      for ver in self.adjList[v]:
+        lst.append(ver)
+      return lst
+  
+  def has_weights(self):
+    return self.weighted
+  
+  def weight(self,v0, v1):
+    if self.has_edge(v0,v1) and self.weighted:
+      for val in self.adjList[v0]:
+        if val[0] == v1:
+          return val[1]
+    return None
+  
+graph = Graph("hep.txt", "list")
+print(graph.edge_count())
