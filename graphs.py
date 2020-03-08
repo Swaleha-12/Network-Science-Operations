@@ -248,14 +248,75 @@ class Graph:
         The weight of the edge between v0 and v1; None if graph is unweighted.
         """
         return self.graph.weight(v0,v1)
+class AdjacencyMatrix:
+  def __init__(self, edges):
+    self.verdict = dict()
+    self.weighted = False
+    self.matrix = []
+    i = 0 #mapping counter for vertices/number of vertices
+    self.edgeCount = 0
+    lst = []
+    for line in edges:
+      line = line.split()
+      line = [int(line[0]), int(line[1])]
+      for ver in line:
+        if ver not in self.verdict:
+          self.verdict[ver] = i
+          i+=1
+          lst.append(0)
+      self.edgeCount+=1 #number of times the for loop runs the number of edges
+    for _ in range(i):
+      self.matrix.append(lst.copy())
 
-# class AdjacencyMatrix:
-#   def __init__(self, edges):
-#     f = open(edges,"r")
-#     line = f.readline()
-#     while line:
-#       line = line.split()
+    self.verCount = i
+    for line in edges:
+      line = line.split()
+      if len(line) > 2:
+        line = [int(line[0]), int(line[1]), eval(line[2])]
+        self.matrix[self.verdict[line[0]]][self.verdict[line[1]]] = line[2]
+        self.matrix[self.verdict[line[1]]][self.verdict[line[0]]] = line[2]
+      else:
+        line = [int(line[0]), int(line[1])]
+        self.matrix[self.verdict[line[0]]][self.verdict[line[1]]] = 1
+        self.matrix[self.verdict[line[1]]][self.verdict[line[0]]] = 1
+    if len(line) > 2:
+      self.weighted = True
 
+  def getvertices(self):
+    return self.verdict.keys()
+
+  def getEdges(self):
+    pass
+
+  def vertex_count(self) -> int:
+    return self.verCount
+
+  def edge_count(self) -> int:
+    return self.edgeCount
+
+  def has_vertex(self, v) -> bool:
+    return v in self.verdict
+
+  def has_edge(self, v0, v1) -> bool:
+    return bool(self.matrix[self.verdict[v0]][self.verdict[v1]]) == True
+
+  def has_weights(self) -> bool:
+    return self.weighted
+
+  def neighbors(self, v):
+    pass
+
+  def degree(self, v) -> {int}:
+    deg = 0
+    for i in self.matrix[self.verdict[v]]:
+      if i:
+        deg+=1
+    return deg
+
+  def weight(self, v0: int, v1: int):
+    if self.has_edge(v0,v1) and self.weighted:
+      return self.matrix[self.verdict[v0]][self.verdict[v1]]
+    return None
 
 
 class AdjacencyList(Graph):
