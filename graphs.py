@@ -257,6 +257,7 @@ class Graph:
 #       line = line.split()
 
 
+
 class AdjacencyList(Graph):
 
   def __init__(self, edges):
@@ -274,6 +275,8 @@ class AdjacencyList(Graph):
         self.adjList[line[0]] = self.adjList.get(line[0], []) + [(line[1],1)]
         self.adjList[line[1]] = self.adjList.get(line[1], []) + [(line[0],1)]
       edj+=1
+    if len(line) > 2:
+      self.weighted = True
     self.verCount = len(self.adjList) #number of keys represent the number of vertex
     self.edgeCount = edj
 
@@ -284,10 +287,7 @@ class AdjacencyList(Graph):
     return self.edgeCount
 
   def getvertices(self) -> [int]:
-    lst = []
-    for key in self.adjList.keys():
-      lst.append(int(key))
-    return lst
+    return self.adjList.keys()
   
   def getEdges(self):
     visited = []
