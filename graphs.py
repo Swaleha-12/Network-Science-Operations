@@ -330,5 +330,6 @@ class AdjacencyList(Graph):
           return val[1]
     return None
 
-graph = Graph("hep.txt", "list")
-print(graph.edge_count())
+f = open("karate.txt")
+graph = Graph(f.readlines(), "list")
+print(graph.vertex_count())
