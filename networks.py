@@ -3,7 +3,7 @@ from graphs import *
 
 
 class NetworkOperations:
-    def degree_centrality(g: Graph, vtx: int) -> float:
+    def degree_centrality(self, g: Graph, vtx: int) -> float:
         """Returns the degree centrality of the vertex, vtx in the graph, g.
 
         Args:
@@ -13,9 +13,25 @@ class NetworkOperations:
         Returns:
         the degree centrality of vtx in g.
         """
-        pass
 
-    def clustering_coefficient(g: Graph, vtx: int = None) -> float:
+        return g.degree(vtx)/(g.vertex_count()-1)
+
+    def local_centrality(vtx: int) -> int:
+        nbr = list()
+        for neighbor in g.neighbors(vtx):
+            nbr.append(neighbor)
+        ki = len(nbr)
+        denominator = (ki*(ki-1))/2
+        L = 0
+        for i in nbr:
+            nv = g.neighbors(i)
+            for j in range(g.degree(i)):
+                if nv in nbr:
+                    L += 1
+                nv = next(g.neighbors(i))
+        return (L//2)/denominator
+
+    def clustering_coefficient(self, g: Graph, vtx: int = None) -> float:
         """Returns the local or average clustering coefficient in g depending on vtx.
 
         vtx = None : average clustering coefficient of g
@@ -28,9 +44,16 @@ class NetworkOperations:
         Returns:
         the local or average clustering coefficient in g.
         """
-        pass
+        if vtx != None:
+            local_centrality(vtx)
+        else:
+            sum = 0
+            n = g.vertex_count()
+            for i in g.vertices():
+                sum += local_centrality(i)
+            return sum
 
-    def average_neighbor_degree(g: Graph, vtx: int) -> float:
+    def average_neighbor_degree(self, g: Graph, vtx: int) -> float:
         """Returns the average neighbor degree of vertex vtx in g.
 
         Args:
@@ -40,9 +63,16 @@ class NetworkOperations:
         Returns:
         the average neighbor degree of vtx in g.
         """
-        pass
+        nbr = list()
+        for neighbor in g.neighbors(vtx):
+            nbr.append(neighbor)
+        Ni = len(nbr)
+        sum = 0
+        for j in nbr:
+            sum += g.degree(j)
+        return sum/Ni
 
-    def similarity(g: Graph, v0: int, v1: int) -> float:
+    def similarity(self, g: Graph, v0: int, v1: int) -> float:
         """Returns the Jaccard similarity of vertices, v0 and v1, in g.
 
         Args:
@@ -52,9 +82,20 @@ class NetworkOperations:
         Returns:
         The Jaccard similarity of vertices, v0 and v1, in g.
         """
-        pass
+        nbr = list()
+        for neighbor in g.neighbors(v0):
+            nbr.append(neighbor)
+        nbr1 = list()
+        for neighbor in g.neighbors(v1):
+            nbr1.append(neighbor)
+        ni, nj = len(nbr), len(nbr1)
+        intersection = 0
+        for i in nbr:
+            if i in nbr1:
+                intersection += 1
+        return intersection/(ni+nj-intersection)
 
-    def popular_distance(g: Graph, vtx: int) -> int:
+    def popular_distance(self, g: Graph, vtx: int) -> int:
         """Returns the popular distance of the vertex, vtx, in g.
 
         Args:
@@ -66,7 +107,7 @@ class NetworkOperations:
         """
         pass
 
-    def visualize(g: Graph) -> None:
+    def visualize(self, g: Graph) -> None:
         """Visualizes g.
 
         Args:
@@ -83,3 +124,9 @@ class NetworkOperations:
         _ = [vizgraph.node(str(v)) for v in g.vertices()]
         vizgraph.edges(map(lambda e: (str(e.v0), str(e.v1)), g.edges()))
         vizgraph.render(view=True)
+
+
+f = open("datasets/karate.txt")
+graph = Graph(f.readlines(), "list")
+nice = NetworkOperations().similarity(graph, 1, 2)
+print(nice)
