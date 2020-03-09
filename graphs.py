@@ -245,6 +245,74 @@ class Graph:
         The weight of the edge between v0 and v1; None if graph is unweighted.
         """
         return self.graph.weight(v0,v1)
+    
+    
+""" Set Graph """
+class SetGraph(Graph):
+  def __init__(self, edges):
+    self.verset = set([])
+    self.edgeset = set([])
+    self.edgeCount = 0
+    i = 0
+    for line in edges:
+      line = line.split()
+      if len(line) > 2:
+        line = [int(line[0]), int(line[1]), eval(line[2])]
+        self.edgeset.add((Edge(line[0],line[1]), line[2]))
+      else:
+        line = [int(line[0]), int(line[1])]
+        self.edgeset.add((Edge(line[0],line[1]),1))
+      for ver in line:
+        if ver not in self.verset:
+          i+=1
+          self.verset.add(ver)
+      self.edgeCount+=1 
+    self.verCount = i
+  
+  def vertices(self):
+    for ver in self.verset:
+      yield ver
+
+  def edges(self):
+    for edge in self.edgeset:
+      yield edge[0]
+
+  def vertex_count(self) -> int:
+    return self.verCount
+
+  def edge_count(self) -> int:
+    return self.edgeCount
+
+  def has_vertex(self, v) -> bool:
+    return v in self.verset
+
+  def has_edge(self, v0, v1) -> bool:
+    for i in self.edgeset:
+      if v0 in i[0] and i[0].nbr(v0) == v1:
+        return True
+    return False
+
+  def has_weights(self) -> bool:
+    return self.weighted
+
+  def neighbors(self, v):
+    for edge in self.edgeset:
+      if v in edge[0]:
+        yield edge[0].nbr(v)
+
+  def degree(self, v) -> {int}:
+    deg = 0
+    for edge in self.edgeset:
+      if v in edge[0]:
+        deg += 1
+    return deg
+
+  def weight(self, v0: int, v1: int):
+    if self.weighted and self.has_edge(v0,v1):
+      for i in self.edgeset:
+        if v0 in i[0] and i[0].nbr(v0) == v1:
+          return i[1]
+    return None
 
 class AdjacencyMatrix:
   def __init__(self, edges):
