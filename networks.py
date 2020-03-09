@@ -1,9 +1,59 @@
 import graphviz
 from graphs import *
+import math
+
+
+def local_centrality(g: Graph, vtx: int) -> int:
+    nbr = list()
+    for neighbor in g.neighbors(vtx):
+        nbr.append(neighbor)
+    ki = len(nbr)
+    denominator = (ki*(ki-1))/2
+    L = 0
+    for i in nbr:
+        nv = g.neighbors(i)
+        for j in range(g.degree(i)):
+            if nv in nbr:
+                L += 1
+            nv = next(g.neighbors(i))
+    if L:
+        return (L//2)/denominator
+    else:
+        return 0
+
+
+def dijkstra(g: Graph, src, dst=None):
+    nodes = []
+    for n in g.vertices():
+        nodes.append(n)
+        nodes += [x for x in g.neighbors(n)]
+    q = set(nodes)
+    nodes = list(q)
+    dist = dict()
+    for n in nodes:
+        dist[n] = float('inf')
+    dist[src] = 0
+    count = 0
+    while q:
+        u = min(q, key=dist.get)
+        q.remove(u)
+        if dst is not None and u == dst:
+            if dist[dst] == math.inf:
+                return -1
+            return dist[dst]
+        for v in g.neighbors(u):
+            w = g.weight(u, v)
+            if w == None:
+                w = 1
+            alt = dist[u] + w
+            if alt < dist[v]:
+                dist[v] = alt
+        count += 1
+    return dist
 
 
 class NetworkOperations:
-    def degree_centrality(self, g: Graph, vtx: int) -> float:
+    def degree_centrality(g: Graph, vtx: int) -> float:
         """Returns the degree centrality of the vertex, vtx in the graph, g.
 
         Args:
@@ -16,25 +66,7 @@ class NetworkOperations:
 
         return g.degree(vtx)/(g.vertex_count()-1)
 
-    def local_centrality(self, g: Graph, vtx: int) -> int:
-        nbr = list()
-        for neighbor in g.neighbors(vtx):
-            nbr.append(neighbor)
-        ki = len(nbr)
-        denominator = (ki*(ki-1))/2
-        L = 0
-        for i in nbr:
-            nv = g.neighbors(i)
-            for j in range(g.degree(i)):
-                if nv in nbr:
-                    L += 1
-                nv = next(g.neighbors(i))
-        if L:
-            return (L//2)/denominator
-        else:
-            return 0
-
-    def clustering_coefficient(self, g: Graph, vtx: int = None) -> float:
+    def clustering_coefficient(g: Graph, vtx: int = None) -> float:
         """Returns the local or average clustering coefficient in g depending on vtx.
 
         vtx = None : average clustering coefficient of g
@@ -48,15 +80,15 @@ class NetworkOperations:
         the local or average clustering coefficient in g.
         """
         if vtx != None:
-            return self.local_centrality(g, vtx)
+            return local_centrality(g, vtx)
 
         else:
             sum = 0
             for i in g.vertices():
-                sum += self.local_centrality(g, i)
+                sum += local_centrality(g, i)
             return sum
 
-    def average_neighbor_degree(self, g: Graph, vtx: int) -> float:
+    def average_neighbor_degree(g: Graph, vtx: int) -> float:
         """Returns the average neighbor degree of vertex vtx in g.
 
         Args:
@@ -75,7 +107,7 @@ class NetworkOperations:
             sum += g.degree(j)
         return sum/Ni
 
-    def similarity(self, g: Graph, v0: int, v1: int) -> float:
+    def similarity(g: Graph, v0: int, v1: int) -> float:
         """Returns the Jaccard similarity of vertices, v0 and v1, in g.
 
         Args:
@@ -98,7 +130,7 @@ class NetworkOperations:
                 intersection += 1
         return intersection/(ni+nj-intersection)
 
-    def popular_distance(self, g: Graph, vtx: int) -> int:
+    def popular_distance(g: Graph, vtx: int) -> int:
         """Returns the popular distance of the vertex, vtx, in g.
 
         Args:
@@ -109,11 +141,19 @@ class NetworkOperations:
         the popular distance of the vertex, vtx, in g.
         """
         # finding popular vertex first
-        source, max_dist = 0, 0
+        max_dist, source = 0, vtx
 
         for i in g.vertices():
             if g.degree(i) > max_dist:
-                source, max_dist = i, g.degree(i)
+                max_dist, source = g.degree(i), i
+        '''popular = []
+        for i in g.vertices():
+            if g.degree(i) == max_dist:
+                popular.append(i)
+        print(popular)
+
+        if source == vtx:
+            return 0
 
         inf = float('inf')
 
@@ -164,9 +204,10 @@ class NetworkOperations:
             current_vertex = previous_vertices[current_vertex]
         if path:
             path.insert(0, current_vertex)
-        return len(path)
+        return len(path)'''
+        return dijkstra(g, vtx, source)
 
-    def visualize(self, g: Graph) -> None:
+    def visualize(g: Graph) -> None:
         """Visualizes g.
 
         Args:

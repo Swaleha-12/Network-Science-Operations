@@ -212,18 +212,19 @@ class SetGraph(Graph):
         self.edgeCount = 0
         i = 0
         for line in edges.splitlines():
-            line = line.split()
-            if len(line) > 2:
-                line = [int(line[0]), int(line[1]), eval(line[2])]
-                self.edgeset.add((Edge(line[0], line[1]), line[2]))
-            else:
-                line = [int(line[0]), int(line[1])]
-                self.edgeset.add((Edge(line[0], line[1]), 1))
-            for ver in line:
-                if ver not in self.verset:
-                    i += 1
-                    self.verset.add(ver)
-            self.edgeCount += 1
+            if line != '':
+                line = line.split()
+                if len(line) > 2:
+                    line = [int(line[0]), int(line[1]), eval(line[2])]
+                    self.edgeset.add((Edge(line[0], line[1]), line[2]))
+                else:
+                    line = [int(line[0]), int(line[1])]
+                    self.edgeset.add((Edge(line[0], line[1]), 1))
+                for ver in line:
+                    if ver not in self.verset:
+                        i += 1
+                        self.verset.add(ver)
+                self.edgeCount += 1
         self.verCount = i
         if len(line) > 2:
             self.weighted = True
@@ -284,30 +285,34 @@ class AdjacencyMatrix:
         lst = []
         edges = edges.splitlines()
         for line in edges:
-            line = line.split()
-            line = [int(line[0]), int(line[1])]
-            for ver in line:
-                if ver not in self.verdict:
-                    self.verdict[ver] = i
-                    i += 1
-                    lst.append(0)
-            self.edgeCount += 1  # number of times the for loop runs the number of edges
+            if line != '':
+                line = line.split()
+                line = [int(line[0]), int(line[1])]
+                for ver in line:
+                    if ver not in self.verdict:
+                        self.verdict[ver] = i
+                        i += 1
+                        lst.append(0)
+                self.edgeCount += 1  # number of times the for loop runs the number of edges
         self.verCount = i
         for i in range(self.verCount):
             self.matrix.append(list(lst))
 
         for line in edges:
-            line = line.split()
-            if len(line) > 2:
-                line = [int(line[0]), int(line[1]), eval(line[2])]
-                self.matrix[self.verdict[line[0]]
-                            ][self.verdict[line[1]]] = line[2]
-                self.matrix[self.verdict[line[1]]
-                            ][self.verdict[line[0]]] = line[2]
-            else:
-                line = [int(line[0]), int(line[1])]
-                self.matrix[self.verdict[line[0]]][self.verdict[line[1]]] = 1
-                self.matrix[self.verdict[line[1]]][self.verdict[line[0]]] = 1
+            if line != '':
+                line = line.split()
+                if len(line) > 2:
+                    line = [int(line[0]), int(line[1]), eval(line[2])]
+                    self.matrix[self.verdict[line[0]]
+                                ][self.verdict[line[1]]] = line[2]
+                    self.matrix[self.verdict[line[1]]
+                                ][self.verdict[line[0]]] = line[2]
+                else:
+                    line = [int(line[0]), int(line[1])]
+                    self.matrix[self.verdict[line[0]]
+                                ][self.verdict[line[1]]] = 1
+                    self.matrix[self.verdict[line[1]]
+                                ][self.verdict[line[0]]] = 1
         if len(line) > 2:
             self.weighted = True
 
@@ -365,24 +370,26 @@ class AdjacencyMatrix:
 class AdjacencyList(Graph):
 
     def __init__(self, edges):
+
         self.adjList = dict()  # adjacency List representation
         self.weighted = False  # weather the graph has weights or not
         edj = 0
         for line in edges.splitlines():
-            line = line.split()
-            if len(line) > 2:
-                line = [int(line[0]), int(line[1]), eval(line[2])]
-                self.adjList[line[0]] = self.adjList.get(
-                    line[0], []) + [(line[1], line[2])]
-                self.adjList[line[1]] = self.adjList.get(
-                    line[1], []) + [(line[0], line[2])]
-            else:
-                line = [int(line[0]), int(line[1])]
-                self.adjList[line[0]] = self.adjList.get(
-                    line[0], []) + [(line[1], 1)]
-                self.adjList[line[1]] = self.adjList.get(
-                    line[1], []) + [(line[0], 1)]
-            edj += 1
+            if line != '':
+                line = line.split()
+                if len(line) > 2:
+                    line = [int(line[0]), int(line[1]), eval(line[2])]
+                    self.adjList[line[0]] = self.adjList.get(
+                        line[0], []) + [(line[1], line[2])]
+                    self.adjList[line[1]] = self.adjList.get(
+                        line[1], []) + [(line[0], line[2])]
+                else:
+                    line = [int(line[0]), int(line[1])]
+                    self.adjList[line[0]] = self.adjList.get(
+                        line[0], []) + [(line[1], 1)]
+                    self.adjList[line[1]] = self.adjList.get(
+                        line[1], []) + [(line[0], 1)]
+                edj += 1
         if len(line) > 2:
             self.weighted = True
         # number of keys represent the number of vertex
