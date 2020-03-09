@@ -108,8 +108,8 @@ class Graph:
         Returns:
         nothing.
         """
-        # if imp == "sets":
-        #     self.graph = SetGraph(edges)
+        if imp == "sets":
+            self.graph = SetGraph(edges)
         if imp == "matrix":
             self.graph = AdjacencyMatrix(edges)
         elif imp == "list":
@@ -245,16 +245,16 @@ class Graph:
         The weight of the edge between v0 and v1; None if graph is unweighted.
         """
         return self.graph.weight(v0,v1)
-    
-    
+
 """ Set Graph """
 class SetGraph(Graph):
   def __init__(self, edges):
     self.verset = set([])
     self.edgeset = set([])
+    self.weighted = False
     self.edgeCount = 0
     i = 0
-    for line in edges:
+    for line in edges.splitlines():
       line = line.split()
       if len(line) > 2:
         line = [int(line[0]), int(line[1]), eval(line[2])]
@@ -268,6 +268,8 @@ class SetGraph(Graph):
           self.verset.add(ver)
       self.edgeCount+=1 
     self.verCount = i
+    if len(line) > 2:
+      self.weighted = True
   
   def vertices(self):
     for ver in self.verset:
@@ -313,6 +315,7 @@ class SetGraph(Graph):
         if v0 in i[0] and i[0].nbr(v0) == v1:
           return i[1]
     return None
+  
 
 class AdjacencyMatrix:
   def __init__(self, edges):
@@ -322,6 +325,7 @@ class AdjacencyMatrix:
     i = 0 #mapping counter for vertices/number of vertices
     self.edgeCount = 0
     lst = []
+    edges = edges.splitlines()
     for line in edges:
       line = line.split()
       line = [int(line[0]), int(line[1])]
@@ -331,10 +335,10 @@ class AdjacencyMatrix:
           i+=1
           lst.append(0)
       self.edgeCount+=1 #number of times the for loop runs the number of edges
-    for _ in range(i):
-      self.matrix.append(lst.copy())
-
     self.verCount = i
+    for i in range(self.verCount):
+      self.matrix.append(list(lst))
+
     for line in edges:
       line = line.split()
       if len(line) > 2:
@@ -404,7 +408,7 @@ class AdjacencyList(Graph):
     self.adjList = dict() #adjacency List representation
     self.weighted = False #weather the graph has weights or not
     edj = 0
-    for line in edges:
+    for line in edges.splitlines():
       line = line.split()
       if len(line) > 2:
         line = [int(line[0]), int(line[1]), eval(line[2])]
@@ -466,6 +470,5 @@ class AdjacencyList(Graph):
           return val[1]
     return None
 
-f = open("karate.txt")
-graph = Graph(f.readlines(), "list")
-print(graph.vertex_count())
+graph = Graph(open("karate.txt").read(), "sets")
+print(graph.has_edge(0,1))
