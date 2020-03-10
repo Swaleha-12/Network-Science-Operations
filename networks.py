@@ -5,21 +5,23 @@ import math
 
 def local_centrality(g: Graph, vtx: int) -> int:
     nbr = list()
-    for neighbor in g.neighbors(vtx):
-        nbr.append(neighbor)
-    ki = len(nbr)
-    denominator = (ki*(ki-1))/2
     L = 0
-    for i in nbr:
-        nv = g.neighbors(i)
-        for j in range(g.degree(i)):
-            if nv in nbr:
-                L += 1
-            nv = next(g.neighbors(i))
-    if L:
-        return (L//2)/denominator
-    else:
+    ki = 0
+    for n in g.neighbors(vtx):
+        for n_of_n in g.neighbors(vtx):
+            if n == n_of_n:
+                continue
+            else:
+                if n_of_n in nbr:
+                    continue
+                elif n_of_n in g.neighbors(n):
+                    L += 1
+
+        ki += 1
+        nbr.append(n)
+    if ki == 1:
         return 0
+    return (L / ((ki*(ki-1))/2))
 
 
 def dijkstra(g: Graph, src, dst=None):
@@ -86,7 +88,7 @@ class NetworkOperations:
             sum = 0
             for i in g.vertices():
                 sum += local_centrality(g, i)
-            return sum
+            return sum//g.vertices()
 
     def average_neighbor_degree(g: Graph, vtx: int) -> float:
         """Returns the average neighbor degree of vertex vtx in g.
@@ -146,65 +148,7 @@ class NetworkOperations:
         for i in g.vertices():
             if g.degree(i) > max_dist:
                 max_dist, source = g.degree(i), i
-        '''popular = []
-        for i in g.vertices():
-            if g.degree(i) == max_dist:
-                popular.append(i)
-        print(popular)
 
-        if source == vtx:
-            return 0
-
-        inf = float('inf')
-
-        # 1. Mark all nodes unvisited and store them.
-        # 2. Set the distance to zero for our initial node
-        # and to infinity for other nodes.
-        distances = {vertex: inf for vertex in g.vertices()}
-        previous_vertices = {
-            vertex: None for vertex in g.vertices()
-        }
-        distances[source] = 0
-        vertices = []
-        for i in g.vertices():
-            vertices.append(i)
-
-        while vertices:
-            # 3. Select the unvisited node with the smallest distance,
-            # it's current node now.
-            current_vertex = min(
-                vertices, key=lambda vertex: distances[vertex])
-
-            # 6. Stop, if the smallest distance
-            # among the unvisited nodes is infinity.
-            if distances[current_vertex] == inf:
-                break
-
-            # 4. Find unvisited neighbors for the current node
-            # and calculate their distances through the current node.
-            for neighbour in g.neighbors(current_vertex):
-                if g.weight(current_vertex, neighbour):
-                    alternative_route = distances[current_vertex] + \
-                        g.weight(current_vertex, neighbour)
-                else:
-                    alternative_route = distances[current_vertex]
-                # Compare the newly calculated distance to the assigned
-                # and save the smaller one.
-                if alternative_route < distances[neighbour]:
-                    distances[neighbour] = alternative_route
-                    previous_vertices[neighbour] = current_vertex
-
-            # 5. Mark the current node as visited
-            # and remove it from the unvisited set.
-            vertices.remove(current_vertex)
-
-        path, current_vertex = list(), vtx
-        while previous_vertices[current_vertex] is not None:
-            path.append(current_vertex)
-            current_vertex = previous_vertices[current_vertex]
-        if path:
-            path.insert(0, current_vertex)
-        return len(path)'''
         return dijkstra(g, vtx, source)
 
     def visualize(g: Graph) -> None:
@@ -224,3 +168,8 @@ class NetworkOperations:
         _ = [vizgraph.node(str(v)) for v in g.vertices()]
         vizgraph.edges(map(lambda e: (str(e.v0), str(e.v1)), g.edges()))
         vizgraph.render(view=True)
+
+
+'''graph = Graph(open("karate.txt").read(), "list")
+nice = NetworkOperations().clustering_coefficient(graph, 12)
+print(nice)'''
