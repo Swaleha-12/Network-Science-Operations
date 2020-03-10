@@ -146,7 +146,7 @@ class NetworkOperations:
         max_dist, source = 0, vtx
 
         for i in g.vertices():
-            deg = d.degree(i)
+            deg = g.degree(i)
             if deg > max_dist:
                 max_dist, source = deg, i
 
