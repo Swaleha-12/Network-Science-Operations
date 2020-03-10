@@ -206,61 +206,70 @@ class Graph:
 
 class SetGraph(Graph):
     def __init__(self, edges):
-        self.verset = set([])
-        self.edgeset = set([])
-        self.weighted = False
-        self.edgeCount = 0
-        i = 0
-        for line in edges.splitlines():
+        self.verset = set([]) #set of vertices
+        self.edgeset = set([]) #set of edges (Edge type)
+        self.weighted = False #if the graph is weighted
+        self.edgeCount = 0 
+        self.verCount = 0
+        
+        for line in edges.splitlines(): #'line' is string form of an edge
             if line != '':
                 line = line.split()
-                if len(line) > 2:
-                    line = [int(line[0]), int(line[1]), eval(line[2])]
-                    self.edgeset.add((Edge(line[0], line[1]), line[2]))
-                else:
-                    line = [int(line[0]), int(line[1])]
-                    self.edgeset.add((Edge(line[0], line[1]), 1))
-                for ver in line:
+                if len(line) > 2: # if the edge is weighted
+                    line = [ int(line[0]), int(line[1]), eval(line[2]) ]
+                    self.edgeset.add((Edge(line[0], line[1]), line[2])) # a tuple with edge and it's weight
+                else: # if the graph is not weighted
+                    line = [ int(line[0]), int(line[1]) ] 
+                    self.edgeset.add((Edge(line[0], line[1]), 1)) # 1 is the default weight
+                for ver in line: # an edge consists of two vertices, hence the loop
                     if ver not in self.verset:
-                        i += 1
-                        self.verset.add(ver)
-                self.edgeCount += 1
-        self.verCount = i
-        if len(line) > 2:
+                        self.verCount += 1 # to keep count of the number of vertices
+                        self.verset.add(ver) # add vertex to the set
+                self.edgeCount += 1 #number of times main loop runs the number of edges
+        if len(line) > 2: # if the graph is weighted
             self.weighted = True
 
     def vertices(self):
+        # yields vertices by iterating over the set of vetices
         for ver in self.verset:
             yield ver
 
     def edges(self):
+        # yields edges by iterating over the set of edges
         for edge in self.edgeset:
             yield edge[0]
 
     def vertex_count(self) -> int:
+        # returns the number of vertices
         return self.verCount
 
     def edge_count(self) -> int:
+        #returns the number of edges
         return self.edgeCount
 
     def has_vertex(self, v) -> bool:
+        # if v exits in set of vertices then returns true, otherwise false
         return v in self.verset
 
     def has_edge(self, v0, v1) -> bool:
-        for i in self.edgeset:
-            if v0 in i[0] and i[0].nbr(v0) == v1:
+        # if v0 exists in any edge and the other end of edge is v1 then returns true otherwise false
+        for edge in self.edgeset:
+            if v0 in edge[0] and edge[0].nbr(v0) == v1:
                 return True
         return False
 
     def has_weights(self) -> bool:
+        # returns True if the graph is weighted, otherwise false
         return self.weighted
 
     def neighbors(self, v):
+        # iterates over edge and checks if v is an endpoint of an edge. if it is then yields the other endpoint
         for edge in self.edgeset:
             if v in edge[0]:
                 yield edge[0].nbr(v)
 
     def degree(self, v) -> {int}:
+        # if v is an endpoint of any edge. It's degree increments by 1
         deg = 0
         for edge in self.edgeset:
             if v in edge[0]:
@@ -268,10 +277,12 @@ class SetGraph(Graph):
         return deg
 
     def weight(self, v0: int, v1: int):
+        # if v0 is an endpoint of an edge and v1 is the other endpoint then returns the weight, otherwise returns None
+        # if the graph is unweighted the default answer is also None
         if self.weighted and self.has_edge(v0, v1):
-            for i in self.edgeset:
-                if v0 in i[0] and i[0].nbr(v0) == v1:
-                    return i[1]
+            for edge in self.edgeset:
+                if v0 in edge[0] and edge[0].nbr(v0) == v1:
+                    return edge[1]
         return None
 
 
