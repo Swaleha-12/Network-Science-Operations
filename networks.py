@@ -17,7 +17,7 @@ def local_centrality(g: Graph, vtx: int) -> int:
                 L += 1
             nv = next(g.neighbors(i))
     if L:
-        return (L//2)/denominator
+        return (L)/denominator
     else:
         return 0
 
