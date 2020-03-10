@@ -28,9 +28,7 @@ def dijkstra(g: Graph, src, dst=None):
     nodes = []
     for n in g.vertices():
         nodes.append(n)
-        nodes += [x for x in g.neighbors(n)]
-    q = set(nodes)
-    nodes = list(q)
+    q = nodes.copy()
     dist = dict()
     for n in nodes:
         dist[n] = float('inf')
