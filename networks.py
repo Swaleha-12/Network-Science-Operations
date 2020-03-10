@@ -146,8 +146,9 @@ class NetworkOperations:
         max_dist, source = 0, vtx
 
         for i in g.vertices():
-            if g.degree(i) > max_dist:
-                max_dist, source = g.degree(i), i
+            deg = d.degree(i)
+            if deg > max_dist:
+                max_dist, source = deg, i
 
         return dijkstra(g, vtx, source)
 
