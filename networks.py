@@ -33,7 +33,6 @@ def dijkstra(g: Graph, src, dst=None):
     for n in nodes:
         dist[n] = float('inf')
     dist[src] = 0
-    count = 0
     while q:
         u = min(q, key=dist.get)
         q.remove(u)
@@ -48,7 +47,6 @@ def dijkstra(g: Graph, src, dst=None):
             alt = dist[u] + w
             if alt < dist[v]:
                 dist[v] = alt
-        count += 1
     return dist
 
 
