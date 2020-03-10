@@ -89,7 +89,7 @@ class Graph:
         """
         if imp == "sets":
             self.graph = SetGraph(edges)
-        if imp == "matrix":
+        elif imp == "matrix":
             self.graph = AdjacencyMatrix(edges)
         elif imp == "list":
             self.graph = AdjacencyList(edges)
