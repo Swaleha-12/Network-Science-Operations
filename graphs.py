@@ -221,7 +221,8 @@ class SetGraph(Graph):
                 else: # if the graph is not weighted
                     line = [ int(line[0]), int(line[1]) ] 
                     self.edgeset.add((Edge(line[0], line[1]), 1)) # 1 is the default weight
-                for ver in line: # an edge consists of two vertices, hence the loop
+                _line = line[:2]
+                for ver in _line: # an edge consists of two vertices, hence the loop
                     if ver not in self.verset:
                         self.verCount += 1 # to keep count of the number of vertices
                         self.verset.add(ver) # add vertex to the set
@@ -279,7 +280,7 @@ class SetGraph(Graph):
     def weight(self, v0: int, v1: int):
         # if v0 is an endpoint of an edge and v1 is the other endpoint then returns the weight, otherwise returns None
         # if the graph is unweighted the default answer is also None
-        if self.weighted and self.has_edge(v0, v1):
+        if self.weighted:
             for edge in self.edgeset:
                 if v0 in edge[0] and edge[0].nbr(v0) == v1:
                     return edge[1]
