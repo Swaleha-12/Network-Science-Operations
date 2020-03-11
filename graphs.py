@@ -221,7 +221,7 @@ class SetGraph(Graph):
                 else: # if the graph is not weighted
                     line = [ int(line[0]), int(line[1]) ] 
                     self.edgeset.add((Edge(line[0], line[1]), 1)) # 1 is the default weight
-                _line = line[:2]
+                _line = line[:2] # eliminates the possibility of checking weight as a vertex
                 for ver in _line: # an edge consists of two vertices, hence the loop
                     if ver not in self.verset:
                         self.verCount += 1 # to keep count of the number of vertices
@@ -289,31 +289,31 @@ class SetGraph(Graph):
 
 class AdjacencyMatrix:
     def __init__(self, edges):
-        self.verdict = dict()
-        self.weighted = False
+        self.verdict = dict() #dictionary to map the vertices to sequential whole numbers
+        self.weighted = False # whether the graph is weighted or not
         self.matrix = []
-        i = 0  # mapping counter for vertices/number of vertices
+        self.verCount = 0
         self.edgeCount = 0
-        lst = []
+        lst = [] #temporary lst of 0's for matrix
         edges = edges.splitlines()
-        for line in edges:
+        for line in edges: # loop#1 to collect all the vertices
             if line != '':
                 line = line.split()
                 line = [int(line[0]), int(line[1])]
                 for ver in line:
-                    if ver not in self.verdict:
-                        self.verdict[ver] = i
-                        i += 1
-                        lst.append(0)
+                    if ver not in self.verdict: 
+                        self.verdict[ver] = self.verCount # maps vertex to a whole number
+                        self.verCount += 1
+                        lst.append(0) # appends 0's to the list number of vertices times
                 self.edgeCount += 1  # number of times the for loop runs the number of edges
-        self.verCount = i
-        for i in range(self.verCount):
-            self.matrix.append(list(lst))
+                
+        for i in range(self.verCount): # appends list of 0's to the matrix number of vertices times
+            self.matrix.append(list(lst)) 
 
-        for line in edges:
+        for line in edges: #loop #2 to go through the edges
             if line != '':
                 line = line.split()
-                if len(line) > 2:
+                if len(line) > 2: # if weighted
                     line = [int(line[0]), int(line[1]), eval(line[2])]
                     self.matrix[self.verdict[line[0]]
                                 ][self.verdict[line[1]]] = line[2]
