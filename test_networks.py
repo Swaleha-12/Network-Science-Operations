@@ -206,18 +206,18 @@ def test_similarity_list():
                 f'myresult: {myresult}, testcase: {case}'
 
 
-def test_popular_distance_set():
-    fname = ''
-    for case in cases:
-        if case.op == 'D_i':
-            if case.file != fname:
-                fname = case.file
-                g = Graph(fetch_content(fname), imp='sets')
-            v = int(case.vtx.strip())
-            myresult = round(NetworkOperations.popular_distance(g, v))
-            assert int(case.result) == myresult,\
-                'SetGraph failed popular distance. '\
-                f'myresult: {myresult}, testcase: {case}'
+# def test_popular_distance_set():
+#     fname = ''
+#     for case in cases:
+#         if case.op == 'D_i':
+#             if case.file != fname:
+#                 fname = case.file
+#                 g = Graph(fetch_content(fname), imp='sets')
+#             v = int(case.vtx.strip())
+#             myresult = round(NetworkOperations.popular_distance(g, v))
+#             assert int(case.result) == myresult,\
+#                 'SetGraph failed popular distance. '\
+#                 f'myresult: {myresult}, testcase: {case}'
 
 
 def test_popular_distance_matrix():
