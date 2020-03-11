@@ -313,13 +313,13 @@ class AdjacencyMatrix:
         for line in edges: #loop #2 to go through the edges
             if line != '':
                 line = line.split()
-                if len(line) > 2: # if weighted
+                if len(line) > 2: # if weighted, change the corresponding row and column value to the weight
                     line = [int(line[0]), int(line[1]), eval(line[2])]
                     self.matrix[self.verdict[line[0]]
                                 ][self.verdict[line[1]]] = line[2]
                     self.matrix[self.verdict[line[1]]
                                 ][self.verdict[line[0]]] = line[2]
-                else:
+                else: # if unweighted, change the corresponding row and column value to the 1
                     line = [int(line[0]), int(line[1])]
                     self.matrix[self.verdict[line[0]]
                                 ][self.verdict[line[1]]] = 1
@@ -329,51 +329,63 @@ class AdjacencyMatrix:
             self.weighted = True
 
     def vertices(self):
+        # iterates over the vertices and yields them one by one
         for key in self.verdict.keys():
             yield key
 
     def edges(self):
-        keyList = list(self.verdict.keys())
-        valueList = list(self.verdict.values())
+        # iterates over the entire matrix and finds non-zero values, then appends the corresponding edges
+        keyList = list(self.verdict.keys()) #list of all vertices
+        valueList = list(self.verdict.values()) #list of whole number mapping of the vertices
         visited = []
         for i in range(self.verCount):
-            ver1 = keyList[valueList.index(i)]
+            ver1 = keyList[valueList.index(i)] # gets vertex by getting the index of value list which is the same index location as the key in keylist
             for j in range(self.verCount):
-                ver2 = keyList[valueList.index(j)]
+                ver2 = keyList[valueList.index(j)] 
                 if self.matrix[i][j] and ver2 not in visited:
                     yield Edge(ver1, ver2)
-            visited.append(ver1)
+            visited.append(ver1) # keeps check of vetices whose edges have been completely traversed
 
     def vertex_count(self) -> int:
+        # returns number of vertices
         return self.verCount
 
     def edge_count(self) -> int:
+        #returns number of edges
         return self.edgeCount
 
     def has_vertex(self, v) -> bool:
+        # if the vertex exists in the graph returns true otherwise false
         return v in self.verdict
 
     def has_edge(self, v0, v1) -> bool:
+        # the corresponding row and column has a weight or 1, then return true otherwise false
         return bool(self.matrix[self.verdict[v0]][self.verdict[v1]]) == True
 
     def has_weights(self) -> bool:
+        # returns true if the graph is weighted
         return self.weighted
 
     def neighbors(self, v):
-        keyList = list(self.verdict.keys())
-        valueList = list(self.verdict.values())
-        for i in range(self.verCount):
-            if self.matrix[self.verdict[v]][i]:
-                yield keyList[valueList.index(i)]
+        # yields the neighbors of vertex v one by one
+        if self.has_vertex(v):
+            keyList = list(self.verdict.keys())
+            valueList = list(self.verdict.values())
+            for i in range(self.verCount):
+                if self.matrix[self.verdict[v]][i]:
+                    yield keyList[valueList.index(i)]
 
     def degree(self, v) -> {int}:
-        deg = 0
-        for i in self.matrix[self.verdict[v]]:
-            if i:
-                deg += 1
-        return deg
+        # traverses the corresponding row and increments one if a true value is encountered
+        if self.has_vertex(v):
+            deg = 0
+            for i in self.matrix[self.verdict[v]]:
+                if i:
+                    deg += 1
+            return deg
 
     def weight(self, v0: int, v1: int):
+        # returns the weight of the edge
         if self.has_edge(v0, v1) and self.weighted:
             return self.matrix[self.verdict[v0]][self.verdict[v1]]
         return None
@@ -385,40 +397,43 @@ class AdjacencyList(Graph):
 
         self.adjList = dict()  # adjacency List representation
         self.weighted = False  # weather the graph has weights or not
-        edj = 0
+        self.edgeCount = 0
         for line in edges.splitlines():
             if line != '':
                 line = line.split()
-                if len(line) > 2:
+                if len(line) > 2: # if weighted,then add the other end of the edge and weight as a tuple to adjacency list
                     line = [int(line[0]), int(line[1]), eval(line[2])]
                     self.adjList[line[0]] = self.adjList.get(
                         line[0], []) + [(line[1], line[2])]
                     self.adjList[line[1]] = self.adjList.get(
                         line[1], []) + [(line[0], line[2])]
-                else:
+                else: # if unweighted, then add 1 with the vertex as a default weight
                     line = [int(line[0]), int(line[1])]
                     self.adjList[line[0]] = self.adjList.get(
                         line[0], []) + [(line[1], 1)]
                     self.adjList[line[1]] = self.adjList.get(
                         line[1], []) + [(line[0], 1)]
-                edj += 1
+                self.edgeCount += 1 # number of times main loop runs is the number of edges
         if len(line) > 2:
             self.weighted = True
         # number of keys represent the number of vertex
         self.verCount = len(self.adjList)
-        self.edgeCount = edj
 
     def vertex_count(self):
+        # returns number of vertices
         return self.verCount
 
     def edge_count(self):
+        # returns number of edges
         return self.edgeCount
 
-    def vertices(self) -> [int]:
+    def vertices(self):
+        # yields vertices one by one
         for key in self.adjList.keys():
             yield key
 
     def edges(self):
+        # yield edges one by one
         visited = []
         for key in self.adjList:
             for val in self.adjList[key]:
@@ -427,27 +442,33 @@ class AdjacencyList(Graph):
             visited.append(key)
 
     def has_vertex(self, v):
+        # returns true if the vertex exists in the graph
         return v in self.adjList
 
     def has_edge(self, v0, v1):
+        # returns true if the edge exists in the graph
         for val in self.adjList[v0]:
             if val[0] == v1:
                 return True
         return False
 
     def degree(self, v):
+        # returns the degree of the vertex
         if self.has_vertex(v):
             return len(self.adjList[v])
 
     def neighbors(self, v):
+        # returns neighbors of v
         if self.has_vertex(v):
             for ver in self.adjList[v]:
                 yield ver[0]
 
     def has_weights(self):
+        # returns whether the graph has is weighted or not
         return self.weighted
 
     def weight(self, v0, v1):
+        # returns the weight of the corresponding edge between the given vertices
         if self.has_edge(v0, v1) and self.weighted:
             for val in self.adjList[v0]:
                 if val[0] == v1:
