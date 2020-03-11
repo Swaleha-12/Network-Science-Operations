@@ -24,11 +24,8 @@ def local_centrality(g: Graph, vtx: int) -> int:
     return (L / ((ki*(ki-1))/2))
 
 
-def dijkstra(g: Graph, src, dst=None):
-    nodes = []
-    for n in g.vertices():
-        nodes.append(n)
-    q = nodes.copy()
+def dijkstra(g: Graph, src, nodes, dst=None):
+    q = list(nodes)
     dist = dict()
     for n in nodes:
         dist[n] = float('inf')
@@ -133,12 +130,14 @@ class NetworkOperations:
         max_dist, source = 0, 0
 
         # calculating the popular node
+        nodes = []
         for i in g.vertices():
             deg = g.degree(i)
             if deg > max_dist:
                 max_dist, source = deg, i
-
-        return dijkstra(g, vtx, source)
+            nodes.append(i)
+            
+        return dijkstra(g, vtx, nodes, source)
 
     def visualize(g: Graph) -> None:
         """Visualizes g.
